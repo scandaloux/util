@@ -3311,18 +3311,10 @@ local JOINT_INFO = {
 		Offset = Vector3.new(0, -0.25, 0),
 		Rotation = CFrame.Angles(0, 0, math.rad(45))
 	},
-	["Left Shoulder"] = {
-		Limits = { Cone = 70, Twist = 30 },
-	},
-	["Right Shoulder"] = {
-		Limits = { Cone = 70, Twist = 30 },
-	},
-	["Right Hip"] = {
-		Limits = { Cone = 40, Twist = 2.5 },
-	},
-	["Left Hip"] = {
-		Limits = { Cone = 40, Twist = 2.5 },
-	},
+	["Left Shoulder"] = {},
+	["Right Shoulder"] = {},
+	["Right Hip"] = {},
+	["Left Hip"] = {},
 	LeftElbow = {
 		Limits = { Lower = 0, Upper = 160 }
 	},
@@ -3420,10 +3412,11 @@ local GROUPS = {
 }
 
 local R6AttachmentData = {
-	["Right Shoulder"] = {CFrame.new(1.5, 0.5, 0), CFrame.new(1.5, 0, 0)},
-	["Left Shoulder"] = {CFrame.new(-1.5, 0.5, 0), CFrame.new(-1.5, 0, 0)},
-	["Right Hip"] = {CFrame.new(0.5, -1.5, 0), CFrame.new(0.5, -2, 0)},
-	["Left Hip"] = {CFrame.new(-0.5, -1.5, 0), CFrame.new(-0.5, -2, 0)},
+	["Right Shoulder"] = {CFrame.new(0, 0.5, 0), CFrame.new(1.5, 0.5, 0)},
+	["Left Shoulder"] = {CFrame.new(0, 0.5, 0), CFrame.new(-1.5, 0.5, 0)},
+	["Right Hip"] = {CFrame.new(0, 0.5, 0), CFrame.new(0.5, -2, 0)},
+	["Left Hip"] = {CFrame.new(0, 0.5, 0), CFrame.new(-0.5, -2, 0)},
+	Neck = {CFrame.new(0, -0.5, 0), CFrame.new(0, 1, 0)}
 }
 
 
@@ -3475,14 +3468,14 @@ function Ragdoll:setupJoint(jointName, info)
 		if not a0 then
 			a0 = Instance.new("Attachment")
 			a0.Name = rigAttachmentName
-			a0.CFrame = R6AttachmentData[jointName] and R6AttachmentData[jointName][1] or CFrame.identity
+			a0.CFrame = R6AttachmentData[jointName] and R6AttachmentData[jointName][2] or CFrame.identity
 			a0.Parent = existingMotor.Part0
 		end
 
 		if not a1 then
 			a1 = Instance.new("Attachment")
 			a1.Name = rigAttachmentName
-			a1.CFrame = R6AttachmentData[jointName] and R6AttachmentData[jointName][2] or CFrame.identity
+			a1.CFrame = R6AttachmentData[jointName] and R6AttachmentData[jointName][3] or CFrame.identity
 			a1.Parent = existingMotor.Part1
 		end
 
