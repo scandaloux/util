@@ -3414,8 +3414,8 @@ local GROUPS = {
 local R6AttachmentData = {
 	["Right Shoulder"] = {CFrame.new(0, 0.5, 0), CFrame.new(1.5, 0.5, 0)},
 	["Left Shoulder"] = {CFrame.new(0, 0.5, 0), CFrame.new(-1.5, 0.5, 0)},
-	["Right Hip"] = {CFrame.new(0, 0.5, 0), CFrame.new(0.5, -2, 0)},
-	["Left Hip"] = {CFrame.new(0, 0.5, 0), CFrame.new(-0.5, -2, 0)},
+	["Right Hip"] = {CFrame.new(0, 0.5, 0), CFrame.new(0.5, -1.5, 0)},
+	["Left Hip"] = {CFrame.new(0, 0.5, 0), CFrame.new(-0.5, -1.5, 0)},
 	Neck = {CFrame.new(0, -0.5, 0), CFrame.new(0, 1, 0)}
 }
 
@@ -3458,7 +3458,7 @@ function Ragdoll:setupJoint(jointName, info)
 		}
 	else
 		local constraintType = "HingeConstraint"
-		if info.Limits and info.Limits.Cone and info.Limits.Twist then
+		if (info.Limits and info.Limits.Cone and info.Limits.Twist) or R6AttachmentData[jointName] then
 			constraintType = "BallSocketConstraint"
 		end
 
