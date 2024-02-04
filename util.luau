@@ -3311,6 +3311,18 @@ local JOINT_INFO = {
 		Offset = Vector3.new(0, -0.25, 0),
 		Rotation = CFrame.Angles(0, 0, math.rad(45))
 	},
+	["Left Shoulder"] = {
+		Limits = { Cone = 70, Twist = 30 },
+	},
+	["Right Shoulder"] = {
+		Limits = { Cone = 70, Twist = 30 },
+	},
+	["Right Hip"] = {
+		Limits = { Cone = 40, Twist = 2.5 },
+	},
+	["Left Hip"] = {
+		Limits = { Cone = 40, Twist = 2.5 },
+	},
 	LeftElbow = {
 		Limits = { Lower = 0, Upper = 160 }
 	},
@@ -3367,7 +3379,9 @@ local GROUPS = {
 		"LeftElbow",
 		"RightElbow",
 		"LeftWrist",
-		"RightWrist"
+		"RightWrist",
+		"Left Shoulder",
+		"Right Shoulder",
 	},
 	LowerBody = {
 		"LeftHip",
@@ -3375,27 +3389,33 @@ local GROUPS = {
 		"LeftKnee",
 		"RightKnee",
 		"LeftAnkle",
-		"RightAnkle"
+		"RightAnkle",
+		"Left Hip",
+		"Right Hip",
 	},
 	LeftArm = {
 		"LeftShoulder",
+		"Left Shoulder",
 		"LeftElbow",
 		"LeftWrist",
 	},
 	RightArm = {
 		"RightShoulder",
+		"Right Shoulder",
 		"RightElbow",
 		"RightWrist"
 	},
 	LeftLeg = {
 		"LeftHip",
 		"LeftKnee",
-		"LeftAnkle"
+		"LeftAnkle",
+		"Left Hip"
 	},
 	RightLeg = {
 		"RightHip",
 		"RightKnee",
-		"RightAnkle"
+		"RightAnkle",
+		"Right Hip",
 	},
 }
 
@@ -10012,7 +10032,7 @@ local util_modules = {
 	libdeflate = {LibDeflate, "https://safeteewow.github.io/LibDeflate/source/LibDeflate.lua.html"},
 	spring = {Spring, "https://quenty.github.io/NevermoreEngine/api/Spring/"},
 	roact = {Roact, "https://roblox.github.io/roact/api-reference/"},
-	ragdoll = {Ragdoll, "Roblox made ragdoll module.\n\nlocal ragdollObject = Ragdoll.new(Character: Model)\n\nragdollObject:setupJoint(jointName: string, info: {Limits: {Cone: number?, Twist: number?, Lower: number?, Upper: number?}?})\nragdollObject:setJointRagdolled(jointName: string, ragdolled: boolean)\nragdollObject:setGroupRagdolled(jointName: string, ragdolled: boolean)\nragdollObject:setRagdolled(ragdolled: boolean, whitelist: {jointName}?)\nragdollObject:destroy()"},
+	ragdoll = {Ragdoll, "Edited roblox made ragdoll module. (edited to support R6)\n\nlocal ragdollObject = Ragdoll.new(Character: Model)\n\nragdollObject:setupJoint(jointName: string, info: {Limits: {Cone: number?, Twist: number?, Lower: number?, Upper: number?}?})\nragdollObject:setJointRagdolled(jointName: string, ragdolled: boolean)\nGroups: LeftArm, RightArm, RightLeg, LeftLeg, LowerBody, UpperBody\nragdollObject:setGroupRagdolled(groupName: string, ragdolled: boolean)\nragdollObject:setRagdolled(ragdolled: boolean, whitelist: {jointName}?)\nragdollObject:destroy()"},
 	roblox = {Roblox, "Roblox made util module. (LIMITED DOCS)\n"},
 	getclosest = {GetClosest, "Created by Synarx.\n\nGetClosest.Single(Position: Vector3, Distance: number, Check: ((Character: Model) => boolean)?): TargetCharacter, DistanceFromTarget, TargetRootPart, TargetHumanoid, TargetPivot\nGetClosest.Collection((Position: Vector3, Distance: number, Check: ((Character: Model) => boolean)?): {{TargetCharacter, DistanceFromTarget, TargetRootPart, TargetHumanoid, TargetPivot}...}"},
 	interval = {function(Callback, Time, WaitTime)
