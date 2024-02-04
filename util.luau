@@ -3420,10 +3420,10 @@ local GROUPS = {
 }
 
 local R6AttachmentData = {
-	["Right Shoulder"] = {CFrame.new(0, 0.5, 0), CFrame.new(1.5, 0.5, 0), CFrame.new(1.5, 0, 0)},
-	["Left Shoulder"] = {CFrame.new(0, 0.5, 0), CFrame.new(-1.5, 0.5, 0), CFrame.new(-1.5, 0, 0)},
-	["Right Hip"] = {CFrame.new(0, 0.5, 0), CFrame.new(0.5, -1.5, 0), CFrame.new(0.5, -2, 0)},
-	["Left Hip"] = {CFrame.new(0, 0.5, 0), CFrame.new(-0.5, -1.5, 0), CFrame.new(-0.5, -2, 0)},
+	["Right Shoulder"] = {CFrame.new(1.5, 0.5, 0), CFrame.new(1.5, 0, 0)},
+	["Left Shoulder"] = {CFrame.new(-1.5, 0.5, 0), CFrame.new(-1.5, 0, 0)},
+	["Right Hip"] = {CFrame.new(0.5, -1.5, 0), CFrame.new(0.5, -2, 0)},
+	["Left Hip"] = {CFrame.new(-0.5, -1.5, 0), CFrame.new(-0.5, -2, 0)},
 }
 
 
