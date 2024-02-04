@@ -3427,7 +3427,7 @@ function Ragdoll.new(character)
 	local self = setmetatable({}, Ragdoll)
 	self.character = character
 	self.humanoid = character:WaitForChild("Humanoid")
-
+	self.humanoid.RequiresNeck = false
 	self.joints = {}
 	for jointName, info in pairs(JOINT_INFO) do
 		self.joints[jointName] = self:setupJoint(jointName, info)
@@ -3475,7 +3475,7 @@ function Ragdoll:setupJoint(jointName, info)
 		if not a1 then
 			a1 = Instance.new("Attachment")
 			a1.Name = rigAttachmentName
-			a1.CFrame = R6AttachmentData[jointName] and R6AttachmentData[jointName][3] or CFrame.identity
+			a1.CFrame = R6AttachmentData[jointName] and R6AttachmentData[jointName][1] or CFrame.identity
 			a1.Parent = existingMotor.Part1
 		end
 
