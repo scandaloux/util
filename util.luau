@@ -3482,7 +3482,8 @@ function Ragdoll:setupJoint(jointName, info)
 		local collider = Instance.new("Part")
 		collider.Size = existingMotor.Part1.Size * 0.8
 		collider.Transparency = 1
-		collider.Parent = exisitngMotor.Part1
+		collider.Parent = existingMotor.Part1
+
 		local weld = Instance.new("Weld")
 		weld.Part0 = collider.Parent
 		weld.Part1 = collider
