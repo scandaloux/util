@@ -10053,8 +10053,57 @@ function Base64.Decode(Input)
 	return table.concat(NewOutput)
 end
 
+local Projectile = (function()
+local GravityForce = Vector3.yAxis * -workspace.Gravity
+workspace:GetPropertyChangedSignal("Gravity"):Connect(function()
+	GravityForce = Vector3.yAxis * -workspace.Gravity
+end)
+
+local Rendering = {}
+game:GetService("RunService").Heartbeat:Connect(function(DeltaTime)
+	for _, Projectile in ipairs(Rendering) do
+		local LastStep = Projectile.CurrentPosition
+		local NextStep = Projectile.Origin + Projectile.Velocity * DeltaTime + 0.5 * GravityForce * (DeltaTime ^ 2)
+		local Diff = LastStep - NextStep
+		
+		local Part = Projectile.Part
+		if Part then
+			Part.Position = NextStep
+		end
+		
+		Projectile.CurrentPosition = NextStep
+		Projectile.CurrentVelocity = Diff
+		
+		if Projectile.Step then
+			Projectile.Step(Projectile, DeltaTime)
+		end
+		if Projectile.Touched then
+			local HitCast = workspace:Raycast(LastStep, Diff, Projectile.Params)
+			if HitCast then
+				Projectile.Touched(Projectile, HitCast)
+			end
+		end
+	end
+end)
+
+return function(Data)
+	local ID = #Rendering + 1
+	function Data:Destroy()
+		if Data.Removing then
+			Data.Removing(Data)
+		end
+		if Data.Part then
+			Data.Part:Destroy()
+		end
+		Rendering[ID] = nil
+	end
+	table.insert(Rendering, Data)
+end
+end)()
+
 
 local util_modules = {
+	projectile = {Projectile, "Created by Synarx.\n\ncant be bothered to doc"},
 	base64 = {Base64, "https://gist.github.com/Reselim/40d62b17d138cc74335a1b0709e19ce2\n\nBase64.Encode(Input: string): string\nBase64.Decode(Input: string): string"},
 	canvasdraw = {CanvasDraw, "https://devforum.roblox.com/t/2017699"},
 	libdeflate = {LibDeflate, "https://safeteewow.github.io/LibDeflate/source/LibDeflate.lua.html"},
