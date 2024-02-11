@@ -10087,6 +10087,8 @@ game:GetService("RunService").Heartbeat:Connect(function(DeltaTime)
 end)
 
 return function(Data)
+	Data.CurrentPosition = Data.Origin
+	Data.CurrentVelocity = Data.Velocity
 	local ID = #Rendering + 1
 	function Data:StopRender()
 		Rendering[ID] = nil
