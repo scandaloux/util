@@ -10088,14 +10088,17 @@ end)
 
 return function(Data)
 	local ID = #Rendering + 1
+	function Data:StopRender()
+		Rendering[ID] = nil
+	end
 	function Data:Destroy()
+		self:StopRender()
 		if Data.Removing then
 			Data.Removing(Data)
 		end
 		if Data.Part then
 			Data.Part:Destroy()
 		end
-		Rendering[ID] = nil
 	end
 	table.insert(Rendering, Data)
 end
