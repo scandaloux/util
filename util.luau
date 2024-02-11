@@ -10062,8 +10062,10 @@ end)
 local Rendering = {}
 game:GetService("RunService").Heartbeat:Connect(function(DeltaTime)
 	for _, Projectile in ipairs(Rendering) do
+		Projectile.Elapsed += DeltaTime
+		
 		local LastStep = Projectile.CurrentPosition
-		local NextStep = Projectile.Origin + Projectile.Velocity * DeltaTime + 0.5 * GravityForce * (DeltaTime ^ 2)
+		local NextStep = Projectile.Origin + Projectile.Velocity * Projectile.Elapsed + 0.5 * GravityForce * (Projectile.Elapsed ^ 2)
 		local Diff = LastStep - NextStep
 		
 		local Part = Projectile.Part
@@ -10087,6 +10089,7 @@ game:GetService("RunService").Heartbeat:Connect(function(DeltaTime)
 end)
 
 return function(Data)
+	Data.Elapsed = 0
 	Data.CurrentPosition = Data.Origin
 	Data.CurrentVelocity = Data.Velocity
 	local ID = #Rendering + 1
