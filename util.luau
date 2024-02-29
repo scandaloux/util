@@ -10829,6 +10829,204 @@ end
 
 return xml2lua
 end)()
+
+local RayCast2 = (function()
+local Raycast2 = {}
+
+Raycast2.Globals = {
+	Name = "Ray",
+	Thickness = 1,
+	Color = Color3.new(255),
+	Classes = { 
+		"Frame", 
+		"ImageLabel" 
+	},
+	MAX = math.huge,
+	offset = Vector2.new(0, 0)
+}
+
+Raycast2.Convergence = {}
+
+function Raycast2.Convergence.getConvergencePoint(x1, x2, y1, y2, x3, x4, y3, y4)
+	local den = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4)
+
+	if den == 0 then return end
+
+	local t = ((x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4)) / den
+	local u = -((x1 - x2) * (y1 - y3) - (y1 - y2) * (x1 - x3)) / den
+
+	return u, t
+end
+
+function Raycast2.Convergence.intersects(_self, descendants)
+	local minimumMagnitude = Raycast2.Globals.MAX
+	local minimumMagnitude2 = Raycast2.Globals.MAX
+
+	local minimumFinalPoint;
+	local toReturnHit;
+
+	for _, wall in ipairs(descendants) do
+		if not table.find(Raycast2.Globals.Classes, wall.ClassName) or not wall then continue end
+
+		local pos = wall.AbsolutePosition + Raycast2.Globals.offset
+		local size = wall.AbsoluteSize 
+		local rotation = wall.Rotation
+
+		local wallCorners = {
+			topleft = pos+size/2-math.sqrt((size.X/2)^2+(size.Y/2)^2)*Vector2.new(math.cos(math.rad(rotation)+math.atan2(size.Y, size.X)),math.sin(math.rad(rotation)+math.atan2(size.Y, size.X))),
+			bottomleft = pos+size/2-math.sqrt((size.X/2)^2+(size.Y/2)^2)*Vector2.new(math.cos(math.rad(rotation)-math.atan2(size.Y, size.X)),math.sin(math.rad(rotation)-math.atan2(size.Y, size.X))),
+			bottomright = pos+size/2+math.sqrt((size.X/2)^2+(size.Y/2)^2)*Vector2.new(math.cos(math.rad(rotation)+math.atan2(size.Y, size.X)),math.sin(math.rad(rotation)+math.atan2(size.Y, size.X))),
+			topright = pos+size/2+math.sqrt((size.X/2)^2+(size.Y/2)^2)*Vector2.new(math.cos(math.rad(rotation)-math.atan2(size.Y, size.X)),math.sin(math.rad(rotation)-math.atan2(size.Y, size.X))),
+		} 
+
+		local edges = {
+			{
+				a = wallCorners.topleft,
+				b = wallCorners.bottomleft
+			},
+			{
+				a = wallCorners.topleft,
+				b = wallCorners.topright
+			},
+			{
+				a = wallCorners.bottomleft,
+				b = wallCorners.bottomright
+			},
+			{
+				a = wallCorners.topright,
+				b = wallCorners.bottomright
+			}
+		}	
+
+		local tempPoint;
+		local tempObstacle;
+
+		for _, edge in ipairs(edges) do			
+			local x1, y1 = edge.a.x, edge.a.y
+			local x2, y2 = edge.b.x, edge.b.y
+
+			local x3, y3 = _self._origin.x, _self._origin.y
+			local x4, y4 = _self._direction.x, _self._direction.y
+
+			local u, t = Raycast2.Convergence.getConvergencePoint(x1, x2, y1, y2, x3, x4, y3, y4)
+
+			if t and u and t > 0 and t < 1 and u > 0 then
+				local point = Vector2.new(x1 + t * (x2 - x1), y1 + t * (y2 - y1))
+
+				if (point - _self._origin).magnitude < minimumMagnitude then
+					minimumMagnitude = (point - _self._origin).magnitude 
+					tempPoint = point
+					tempObstacle = wall
+				end
+			end
+		end
+
+		if tempObstacle and tempPoint then 
+			if (tempPoint - _self._origin).magnitude < minimumMagnitude2 then
+				minimumMagnitude2 = (tempPoint - _self._origin).magnitude
+				minimumFinalPoint = tempPoint
+				toReturnHit = tempObstacle
+			end	
+		end
+	end
+
+	return toReturnHit, minimumFinalPoint
+end
+
+local function draw(hyp, origin, thickness, parent) 
+	local line = Instance.new("Frame")
+	line.Name = Raycast2.Globals.Name
+	line.AnchorPoint = Vector2.new(.5, .5)
+	line.Size = UDim2.new(0, hyp, 0, thickness or Raycast2.Globals.Thickness)
+	line.BackgroundColor3 =  Raycast2.Globals.Color
+	line.BorderSizePixel = 0
+	line.Position = UDim2.fromOffset(origin.x, origin.y)
+	line.Parent = parent
+
+	return line
+end
+
+Raycast2.Ray = function (originx, originy, endpointx, endpointy, parent, thickness)
+	local origin = {
+		x = originx,
+		y = originy
+	}
+
+	local endpoint = {
+		x = endpointx,
+		y = endpointy
+	}
+
+	local adj = (Vector2.new(endpoint.x, origin.y) - Vector2.new(origin.x, origin.y)).magnitude
+	local opp = (Vector2.new(endpoint.x, origin.y) - Vector2.new(endpoint.x, endpoint.y)).magnitude
+	local hyp = math.sqrt(adj^2 + opp^2)
+
+	local theta = math.deg(math.acos(adj/hyp))
+
+	local line = draw(hyp, origin, thickness, parent)
+
+	local pos = line.AbsolutePosition
+	local size = line.AbsoluteSize
+
+	if (endpoint.x == origin.x and endpoint.y > origin.y) or (endpoint.x == origin.x and endpoint.y <= origin.y) then
+		theta = 90 -- y axis
+	elseif (endpoint.x < origin.x and endpoint.y == origin.y) or (endpoint.x >= origin.x and endpoint.y == origin.y) then
+		theta = 0 -- x axis
+	elseif endpoint.x >= origin.x and endpoint.y <= origin.y then
+		theta = -theta-- quad 1
+	elseif endpoint.x <= origin.x and endpoint.y <= origin.y then
+		theta = theta + 180 -- quad 2
+	elseif endpoint.x <= origin.x and endpoint.y >= origin.x then
+		theta = theta + 90 -- quad 3
+	elseif endpoint.x >= origin.x and endpoint.y >= origin.x then
+		theta = math.abs(theta) -- quad 4
+	end
+
+	local mid = Vector2.new((origin.x + endpoint.x)/2, (origin.y + endpoint.y)/2)
+
+	line.Position = UDim2.fromOffset(mid.x, mid.y)
+	line.Rotation = theta
+
+	return line
+end
+
+Raycast2.__index = Raycast2
+
+function Raycast2.new(origin, direction)
+	assert(typeof(origin) == "UDim2" or typeof(origin) == "Vector2", "UDim2 or Vector2 expected got "..typeof(origin))
+	assert(typeof(direction) == "UDim2" or typeof(direction) == "Vector2", "UDim2 or Vector2 expected got "..typeof(direction))
+
+	origin = typeof(origin) == "UDim2" and Vector2.new(origin.X.Offset, origin.Y.Offset) or origin
+	direction = typeof(direction) == "UDim2" and Vector2.new(direction.X.Offset, direction.Y.Offset) or direction
+
+	local self = setmetatable({
+		_origin = origin,
+		_direction = direction,
+		_ray = nil,
+		Visible = false,
+	}, Raycast2)
+
+	return self
+end
+
+function Raycast2:Cast(parent: Instance, list: table) 
+	assert(parent:IsA("ScreenGui"), "argument must be a ScreenGui instance")
+
+	if self._ray then self._ray:Destroy(); self._ray = nil end	
+
+	if self.Visible then
+		local ray = Raycast2.Ray(self._origin.x, self._origin.y, self._direction.x, self._direction.y, parent, 1)
+		self._ray = ray
+	end
+
+	local hit, pos = Raycast2.Convergence.intersects(self, list)
+
+	return hit, pos
+end
+
+return Raycast2
+end)
+
 local util_modules = {
 	projectile = {Projectile, "Created by Synarx.\n\ncant be bothered to doc"},
 	xml = {XML, "XML reader cant be bothered to doc"},
@@ -10846,7 +11044,8 @@ local util_modules = {
 			task.wait(WaitTime)
 			Callback((os.clock() - Start) / Time)
 		end
-	end, "Created by Synarx.\n\ninterval(function(Alpha) print(Alpha) end, 5, nil)\nSimple clock function, first argument takes function which is given an 'alpha' value which is a value from 0 - 1 and is a factor of how close it is to its time goal, 2nd argument is the time goal, 3rd is the wait time - the number that is put into task.wait"}
+	end, "Created by Synarx.\n\ninterval(function(Alpha) print(Alpha) end, 5, nil)\nSimple clock function, first argument takes function which is given an 'alpha' value which is a value from 0 - 1 and is a factor of how close it is to its time goal, 2nd argument is the time goal, 3rd is the wait time - the number that is put into task.wait"},
+	raycast2 = {RayCast2, "https://jaipack17.gitbook.io/raycast2/"}
 }
 
 for i, v in Roblox do
